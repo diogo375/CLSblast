@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CLS — Blast Generator</title>
+    <style>
+      :root {
+        --bg: #000000;
+        --panel: #0c0c0c;
+        --panel-raised: #1a1a1a;
+        --border: #2e2e2e;
+        --text: #ffffff;
+        --text-dim: #939393;
+        --accent: #ffffff;
+        --accent-text: #000000;
+        --mono:
+          ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+        --sans:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--sans);
+        font-size: 13px;
+        overflow: hidden;
+      }
+
+      .app {
+        display: flex;
+        height: 100vh;
+        width: 100vw;
+      }
+
+      /* ---------- Sidebar ---------- */
+      .panel {
+        width: 320px;
+        min-width: 320px;
+        background: var(--panel);
+        border-right: 1px solid var(--border);
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .panel-head {
+        padding: 18px 18px 14px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .panel-head .brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+      }
+
+      .panel-head .brand .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+      }
+
+      .panel-head .sub {
+        margin-top: 4px;
+        color: var(--text-dim);
+        font-size: 11.5px;
+        line-height: 1.4;
+      }
+
+      .section {
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .section:last-child {
+        border-bottom: none;
+      }
+
+      .section-title {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        margin-bottom: 12px;
+      }
+
+      .section-title::before {
+        content: "";
+        width: 5px;
+        height: 5px;
+        border-radius: 1px;
+        background: var(--accent);
+      }
+
+      .field {
+        margin-bottom: 12px;
+      }
+
+      .field:last-child {
+        margin-bottom: 0;
+      }
+
+      .field label {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        font-size: 11.5px;
+        color: var(--text-dim);
+        margin-bottom: 6px;
+      }
+
+      .field label .val {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text);
+      }
+
+      input[type="range"] {
+        width: 100%;
+        -webkit-appearance: none;
+        appearance: none;
+        height: 4px;
+        border-radius: 2px;
+        background: var(--border);
+        outline: none;
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        background: var(--accent);
+        border: 2px solid var(--panel);
+        box-shadow: 0 0 0 1px var(--border);
+        cursor: pointer;
+        margin-top: -0.5px;
+      }
+
+      input[type="range"]::-moz-range-thumb {
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        background: var(--accent);
+        border: 2px solid var(--panel);
+        cursor: pointer;
+      }
+
+      .swatch {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--panel-raised);
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        padding: 5px 8px;
+      }
+
+      .swatch input[type="color"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 26px;
+        height: 26px;
+        border: none;
+        border-radius: 6px;
+        padding: 0;
+        background: none;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+
+      .swatch input[type="color"]::-webkit-color-swatch-wrapper {
+        padding: 0;
+      }
+
+      .swatch input[type="color"]::-webkit-color-swatch {
+        border: 1px solid var(--border);
+        border-radius: 6px;
+      }
+
+      .swatch .hex {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--text-dim);
+        text-transform: uppercase;
+      }
+
+      button {
+        font-family: var(--sans);
+        font-size: 12.5px;
+        font-weight: 600;
+        border-radius: 6px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--text-dim);
+        padding: 7px 10px;
+        cursor: pointer;
+        transition:
+          background 0.12s,
+          color 0.12s,
+          border-color 0.12s;
+      }
+
+      .btn {
+        width: 100%;
+        background: var(--panel-raised);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 9px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+
+      .btn:hover {
+        border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+      }
+
+      .btn-accent {
+        background: var(--accent);
+        color: var(--accent-text);
+        border-color: var(--accent);
+      }
+
+      .btn-accent:hover {
+        filter: brightness(0.95);
+      }
+
+      .hint {
+        font-size: 11px;
+        color: var(--text-dim);
+        line-height: 1.5;
+        margin-top: 8px;
+      }
+
+      /* ---------- Stage ---------- */
+      .stage {
+        flex: 1;
+        position: relative;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        cursor: crosshair;
+      }
+
+      .stage canvas {
+        display: block;
+        max-width: 100%;
+        max-height: 100%;
+      }
+
+      .stage-badge {
+        position: absolute;
+        top: 14px;
+        left: 14px;
+        background: rgba(20, 20, 24, 0.55);
+        backdrop-filter: blur(6px);
+        color: #fff;
+        font-family: var(--mono);
+        font-size: 10.5px;
+        letter-spacing: 0.02em;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        pointer-events: none;
+      }
+
+      ::-webkit-scrollbar {
+        width: 9px;
+        height: 9px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 5px;
+      }
+
+      @media (max-width: 720px) {
+        .app {
+          flex-direction: column;
+        }
+
+        .panel {
+          width: 100%;
+          min-width: 0;
+          max-height: 46vh;
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+        }
+
+        .stage {
+          flex: 1;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="app">
+      <aside class="panel">
+        <div class="panel-head">
+          <div class="brand">
+            <span class="dot"></span>CLS — Blast Generator
+          </div>
+          <div class="sub">Click the canvas to generate new blasts</div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Blast Shape</div>
+          <div class="field">
+            <label>Spikes <span class="val" id="spikesVal">12</span></label>
+            <input
+              type="range"
+              id="spikes"
+              min="4"
+              max="16"
+              value="12"
+              step="1"
+            />
+            <div class="hint">Number of spikes in the blast</div>
+          </div>
+          <div class="field">
+            <label
+              >Stroke Width
+              <span class="val" id="strokeWidthVal">30px</span></label
+            >
+            <input
+              type="range"
+              id="strokeWidth"
+              min="20"
+              max="120"
+              value="30"
+              step="5"
+            />
+            <div class="hint">Thickness of the blast outline</div>
+          </div>
+          <div class="field">
+            <label>Size <span class="val" id="sizeVal">70%</span></label>
+            <input
+              type="range"
+              id="size"
+              min="30"
+              max="150"
+              value="70"
+              step="5"
+            />
+            <div class="hint">Scale of the blast</div>
+          </div>
+          <div class="field">
+            <label
+              >Center Diameter
+              <span class="val" id="centerDiameterVal">80%</span></label
+            >
+            <input
+              type="range"
+              id="centerDiameter"
+              min="0"
+              max="80"
+              value="80"
+              step="5"
+            />
+            <div class="hint">Size of the space in the middle</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Color</div>
+          <div class="field">
+            <label>Background</label>
+            <div class="swatch">
+              <input type="color" id="bgColor" value="#000000" />
+              <span class="hex" id="bgColorHex">#000000</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Stroke</label>
+            <div class="swatch">
+              <input type="color" id="strokeColor" value="#ffffff" />
+              <span class="hex" id="strokeColorHex">#FFFFFF</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Generation</div>
+          <button class="btn btn-accent" id="generateBtn">
+            ⟳ Generate New
+          </button>
+          <div class="hint">Or click anywhere on the canvas to generate</div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Export</div>
+          <button class="btn btn-accent" id="exportBtn">⬇ Export SVG</button>
+          <div class="hint">Download the current blast as SVG</div>
+        </div>
+      </aside>
+
+      <main class="stage" id="stage">
+        <canvas id="canvas"></canvas>
+        <div class="stage-badge" id="badge">Ready</div>
+      </main>
+    </div>
+
+    <script>
+      "use strict";
+
+      // ============================================================
+      // Utility functions
+      // ============================================================
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+      function random(min = 0, max = 1) {
+        return Math.random() * (max - min) + min;
+      }
+
+      // ============================================================
+      // Blast Generator
+      // ============================================================
+      class BlastGenerator {
+        constructor(options = {}) {
+          this.spikes = options.spikes || 12;
+          this.irregularity = options.irregularity || 0.5;
+          this.strokeWidth = options.strokeWidth || 60;
+          this.centerDiameter = options.centerDiameter || 80;
+          this.seed = Math.random();
+        }
+
+        // Generate wavy POW symbol outline with organic waves
+        generateOutline() {
+          const numWaves = this.spikes * 2; // More waves for complex outline
+          const angleStep = (Math.PI * 2) / numWaves;
+          const points = [];
+
+          // Generate a wavy perimeter with peaks and valleys
+          for (let i = 0; i < numWaves; i++) {
+            const angle = i * angleStep;
+
+            // Alternate between peaks (outward) and valleys (inward)
+            const isPeak = i % 2 === 0;
+
+            // Base radius varies with irregularity
+            let radius;
+            if (isPeak) {
+              // Peak - extends outward
+              radius =
+                1.0 +
+                random(0.4, 0.8) +
+                random(-this.irregularity * 0.3, this.irregularity * 0.3);
+            } else {
+              // Valley - based on centerDiameter
+              // At 0%, valleys at 0.6 (small center)
+              // At 80%, valleys expand outward to 0.9 (large center)
+              const defaultValley = 0.6;
+              const maxValley = 0.9;
+              const valleyDepth =
+                defaultValley +
+                (this.centerDiameter / 100) * (maxValley - defaultValley);
+              radius =
+                valleyDepth +
+                random(-this.irregularity * 0.2, this.irregularity * 0.2);
+            }
+
+            // Add subtle variation to angles for organic feel
+            const angleVariation =
+              angleStep * random(-0.3, 0.3) * this.irregularity;
+
+            const x = Math.cos(angle + angleVariation) * radius;
+            const y = Math.sin(angle + angleVariation) * radius;
+
+            points.push({ x, y });
+          }
+
+          // Smooth the path with intermediate points for curves
+          const smoothedPoints = [];
+          for (let i = 0; i < points.length; i++) {
+            const current = points[i];
+            const next = points[(i + 1) % points.length];
+
+            smoothedPoints.push(current);
+
+            // Add intermediate point for smoother curve
+            const midX =
+              (current.x + next.x) / 2 + random(-0.1, 0.1) * this.irregularity;
+            const midY =
+              (current.y + next.y) / 2 + random(-0.1, 0.1) * this.irregularity;
+
+            smoothedPoints.push({ x: midX, y: midY });
+          }
+
+          return smoothedPoints;
+        }
+
+        toPath(width, height, size = 100) {
+          const points = this.generateOutline();
+          if (points.length === 0) return "";
+
+          const centerX = width / 2;
+          const centerY = height / 2;
+          const sizeScale = size / 100;
+          const radius = (Math.min(width, height) / 2) * 0.65 * sizeScale;
+
+          // Convert to canvas coordinates
+          const canvasPoints = points.map((p) => ({
+            x: centerX + p.x * radius,
+            y: centerY + p.y * radius,
+          }));
+
+          // Create closed path with curves
+          let path = "";
+          for (let i = 0; i < canvasPoints.length; i++) {
+            const p = canvasPoints[i];
+            if (i === 0) {
+              path += `M ${Math.round(p.x)} ${Math.round(p.y)}`;
+            } else {
+              path += ` L ${Math.round(p.x)} ${Math.round(p.y)}`;
+            }
+          }
+          path += " Z";
+
+          return path;
+        }
+      }
+
+      // ============================================================
+      // Canvas setup
+      // ============================================================
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      const stage = document.getElementById("stage");
+      const badge = document.getElementById("badge");
+
+      let resizeTimeout;
+
+      function resizeCanvas() {
+        const rect = stage.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        draw();
+      }
+
+      window.addEventListener("resize", () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(resizeCanvas, 100);
+      });
+
+      // ============================================================
+      // State
+      // ============================================================
+      let currentBlast = null;
+      let currentPath = "";
+
+      function getOptions() {
+        return {
+          spikes: parseInt(document.getElementById("spikes").value),
+          irregularity: 0.5,
+          strokeWidth: parseInt(document.getElementById("strokeWidth").value),
+          centerDiameter: parseInt(
+            document.getElementById("centerDiameter").value,
+          ),
+        };
+      }
+
+      function generateNewBlast() {
+        const options = getOptions();
+        const size = parseInt(document.getElementById("size").value);
+        currentBlast = new BlastGenerator(options);
+        currentPath = currentBlast.toPath(canvas.width, canvas.height, size);
+        draw();
+        badge.textContent = "Blast generated";
+      }
+
+      // ============================================================
+      // Drawing
+      // ============================================================
+      function draw() {
+        const bgColor = document.getElementById("bgColor").value;
+        const strokeColor = document.getElementById("strokeColor").value;
+        const strokeWidth = parseInt(
+          document.getElementById("strokeWidth").value,
+        );
+
+        // Clear canvas
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        if (!currentPath) {
+          return;
+        }
+
+        // Draw blast using SVG path with stroke only
+        const path = new Path2D(currentPath);
+
+        ctx.strokeStyle = strokeColor;
+        ctx.lineWidth = strokeWidth;
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.stroke(path);
+      }
+
+      // ============================================================
+      // UI Bindings
+      // ============================================================
+      const controls = [
+        { id: "spikes", valId: "spikesVal", format: (v) => v },
+        { id: "strokeWidth", valId: "strokeWidthVal", format: (v) => v + "px" },
+        { id: "size", valId: "sizeVal", format: (v) => v + "%" },
+        {
+          id: "centerDiameter",
+          valId: "centerDiameterVal",
+          format: (v) => v + "%",
+        },
+      ];
+
+      controls.forEach(({ id, valId, format }) => {
+        const input = document.getElementById(id);
+        const valDisplay = document.getElementById(valId);
+        input.addEventListener("input", () => {
+          valDisplay.textContent = format(input.value);
+          generateNewBlast();
+        });
+      });
+
+      const colorControls = [
+        { id: "bgColor", hexId: "bgColorHex" },
+        { id: "strokeColor", hexId: "strokeColorHex" },
+      ];
+
+      colorControls.forEach(({ id, hexId }) => {
+        const input = document.getElementById(id);
+        const hex = document.getElementById(hexId);
+        input.addEventListener("change", () => {
+          hex.textContent = input.value.toUpperCase();
+          draw();
+        });
+        input.addEventListener("input", () => {
+          hex.textContent = input.value.toUpperCase();
+          draw();
+        });
+      });
+
+      document
+        .getElementById("generateBtn")
+        .addEventListener("click", generateNewBlast);
+
+      stage.addEventListener("click", generateNewBlast);
+
+      document.getElementById("exportBtn").addEventListener("click", () => {
+        if (!currentPath) {
+          alert("Generate a blast first");
+          return;
+        }
+
+        const strokeColor = document.getElementById("strokeColor").value;
+        const strokeWidth = document.getElementById("strokeWidth").value;
+
+        const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <path d="${currentPath}" fill="none" stroke="${strokeColor}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" />
+</svg>`;
+
+        const blob = new Blob([svg], { type: "image/svg+xml" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "cls-blast-" + Date.now() + ".svg";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        badge.textContent = "Exported!";
+      });
+
+      // ============================================================
+      // Initialize
+      // ============================================================
+      resizeCanvas();
+      generateNewBlast();
+    </script>
+  </body>
+</html>
