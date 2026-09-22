@@ -7,12 +7,12 @@
     <style>
       :root {
         --bg: #000000;
-        --panel: #0c0c0c;
-        --panel-raised: #1a1a1a;
+        --panel: #c1c1c1;
+        --panel-raised: #d9d5d5;
         --border: #2e2e2e;
-        --text: #ffffff;
-        --text-dim: #939393;
-        --accent: #ffffff;
+        --text: #000000;
+        --text-dim: #000000;
+        --accent: #d9d5d5;
         --accent-text: #000000;
         --mono:
           ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
@@ -58,8 +58,7 @@
       }
 
       .panel-head {
-        padding: 18px 18px 14px;
-        border-bottom: 1px solid var(--border);
+        padding: 0;
       }
 
       .panel-head .brand {
@@ -208,6 +207,56 @@
         text-transform: uppercase;
       }
 
+      .toggle-label {
+        display: flex !important;
+        cursor: pointer;
+      }
+
+      .toggle-label input[type="checkbox"] {
+        width: 15px;
+        height: 15px;
+        accent-color: var(--accent);
+        cursor: pointer;
+      }
+
+      .advanced {
+        margin-top: 12px;
+      }
+
+      .advanced summary {
+        cursor: pointer;
+        font-size: 11.5px;
+        font-weight: 600;
+        color: var(--text-dim);
+        list-style: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .advanced summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .advanced summary::before {
+        content: "▸";
+        font-size: 9px;
+        color: var(--text-dim);
+        transition: transform 0.12s;
+      }
+
+      .advanced[open] summary::before {
+        transform: rotate(90deg);
+      }
+
+      .advanced summary:hover {
+        color: var(--text);
+      }
+
+      .advanced .field {
+        margin-top: 12px;
+      }
+
       button {
         font-family: var(--sans);
         font-size: 12.5px;
@@ -250,6 +299,31 @@
         filter: brightness(0.95);
       }
 
+      .icon-btn-row {
+        display: flex;
+      }
+
+      .icon-btn {
+        flex: 1;
+        margin: 0;
+        padding: 0;
+        background: none;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .icon-btn img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .icon-btn.active img {
+        filter: invert(1);
+      }
+
       .hint {
         font-size: 11px;
         color: var(--text-dim);
@@ -266,7 +340,6 @@
         align-items: center;
         justify-content: center;
         overflow: hidden;
-        cursor: crosshair;
       }
 
       .stage canvas {
@@ -279,7 +352,7 @@
         position: absolute;
         top: 14px;
         left: 14px;
-        background: rgba(20, 20, 24, 0.55);
+        background: rgba(9, 9, 10, 0.55);
         backdrop-filter: blur(6px);
         color: #fff;
         font-family: var(--mono);
@@ -329,14 +402,14 @@
     <div class="app">
       <aside class="panel">
         <div class="panel-head">
-          <div class="brand">
-            <span class="dot"></span>CLS — Blast Generator
-          </div>
-          <div class="sub">Click the canvas to generate new blasts</div>
+          <img
+            src="images/logo2.svg"
+            alt="CLS Blast Generator"
+            style="width: 100%; height: auto; display: block"
+          />
         </div>
 
         <div class="section">
-          <div class="section-title">Blast Shape</div>
           <div class="field">
             <label>Spikes <span class="val" id="spikesVal">12</span></label>
             <input
@@ -347,88 +420,147 @@
               value="12"
               step="1"
             />
-            <div class="hint">Number of spikes in the blast</div>
           </div>
           <div class="field">
             <label
               >Stroke Width
-              <span class="val" id="strokeWidthVal">30px</span></label
+              <span class="val" id="strokeWidthVal">25px</span></label
             >
             <input
               type="range"
               id="strokeWidth"
-              min="20"
-              max="120"
-              value="30"
-              step="5"
+              min="1"
+              max="50"
+              value="25"
+              step="1"
             />
-            <div class="hint">Thickness of the blast outline</div>
           </div>
           <div class="field">
-            <label>Size <span class="val" id="sizeVal">70%</span></label>
+            <label>Size <span class="val" id="sizeVal">50%</span></label>
             <input
               type="range"
               id="size"
               min="30"
               max="150"
-              value="70"
+              value="50"
               step="5"
             />
-            <div class="hint">Scale of the blast</div>
           </div>
           <div class="field">
             <label
               >Center Diameter
-              <span class="val" id="centerDiameterVal">80%</span></label
+              <span class="val" id="centerDiameterVal">65%</span></label
             >
             <input
               type="range"
               id="centerDiameter"
               min="0"
               max="80"
-              value="80"
+              value="65"
               step="5"
             />
-            <div class="hint">Size of the space in the middle</div>
           </div>
+          <div class="field">
+            <label
+              >Round Outer Points
+              <span class="val" id="outerRoundnessVal">61%</span></label
+            >
+            <input
+              type="range"
+              id="outerRoundness"
+              min="0"
+              max="100"
+              value="61"
+              step="1"
+            />
+          </div>
+          <div class="field">
+            <label
+              >Round Inner Points
+              <span class="val" id="innerRoundnessVal">49%</span></label
+            >
+            <input
+              type="range"
+              id="innerRoundness"
+              min="0"
+              max="100"
+              value="49"
+              step="1"
+            />
+          </div>
+          <div class="field">
+            <label class="toggle-label">
+              <input type="checkbox" id="asymmetric" checked />
+              &nbsp;Asymmetric
+            </label>
+          </div>
+          <details class="advanced">
+            <summary>Advanced spike length settings</summary>
+            <div class="field">
+              <label
+                >Min Spike Length
+                <span class="val" id="asymMinVal">95%</span></label
+              >
+              <input
+                type="range"
+                id="asymMin"
+                min="20"
+                max="100"
+                value="95"
+                step="5"
+              />
+            </div>
+            <div class="field">
+              <label
+                >Max Spike Length
+                <span class="val" id="asymMaxVal">140%</span></label
+              >
+              <input
+                type="range"
+                id="asymMax"
+                min="100"
+                max="180"
+                value="140"
+                step="5"
+              />
+            </div>
+          </details>
         </div>
 
         <div class="section">
-          <div class="section-title">Color</div>
           <div class="field">
             <label>Background</label>
             <div class="swatch">
-              <input type="color" id="bgColor" value="#000000" />
-              <span class="hex" id="bgColorHex">#000000</span>
+              <input type="color" id="bgColor" value="#f7ca6b" />
+              <span class="hex" id="bgColorHex">#f7ca6b</span>
             </div>
           </div>
           <div class="field">
             <label>Stroke</label>
             <div class="swatch">
-              <input type="color" id="strokeColor" value="#ffffff" />
-              <span class="hex" id="strokeColorHex">#FFFFFF</span>
+              <input type="color" id="strokeColor" value="#000000" />
+              <span class="hex" id="strokeColorHex">#000000</span>
             </div>
           </div>
         </div>
 
-        <div class="section">
-          <div class="section-title">Generation</div>
-          <button class="btn btn-accent" id="generateBtn">
-            ⟳ Generate New
-          </button>
-          <div class="hint">Or click anywhere on the canvas to generate</div>
-        </div>
-
-        <div class="section">
-          <div class="section-title">Export</div>
-          <button class="btn btn-accent" id="exportBtn">⬇ Export SVG</button>
-          <div class="hint">Download the current blast as SVG</div>
+        <div class="section" style="padding: 0">
+          <div class="icon-btn-row">
+            <button class="icon-btn" id="generateBtn" title="Generate">
+              <img src="images/generate.svg" alt="Generate" />
+            </button>
+            <button class="icon-btn" id="animateBtn" title="Animate">
+              <img src="images/play.svg" alt="Animate" />
+            </button>
+            <button class="icon-btn" id="exportBtn" title="Export SVG">
+              <img src="images/download.svg" alt="Export SVG" />
+            </button>
+          </div>
         </div>
       </aside>
 
       <main class="stage" id="stage">
         <canvas id="canvas"></canvas>
-        <div class="stage-badge" id="badge">Ready</div>
       </main>
     </div>
 
@@ -440,115 +572,206 @@
       // ============================================================
       const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
-      function random(min = 0, max = 1) {
-        return Math.random() * (max - min) + min;
-      }
-
       // ============================================================
       // Blast Generator
       // ============================================================
       class BlastGenerator {
         constructor(options = {}) {
-          this.spikes = options.spikes || 12;
-          this.irregularity = options.irregularity || 0.5;
-          this.strokeWidth = options.strokeWidth || 60;
-          this.centerDiameter = options.centerDiameter || 80;
-          this.seed = Math.random();
+          this.spikes = options.spikes ?? 12;
+          this.strokeWidth = options.strokeWidth ?? 60;
+          this.centerDiameter = options.centerDiameter ?? 65;
+          this.asymmetric = options.asymmetric ?? true;
+          this.asymMin = options.asymMin ?? 95;
+          this.asymMax = options.asymMax ?? 140;
+          this.spikeVariance =
+            options.spikeVariance ??
+            Array.from({ length: this.spikes }, () => Math.random());
         }
 
-        // Generate wavy POW symbol outline with organic waves
+        // Generate a regular star outline (Illustrator-style star tool)
         generateOutline() {
-          const numWaves = this.spikes * 2; // More waves for complex outline
-          const angleStep = (Math.PI * 2) / numWaves;
+          const numPoints = this.spikes * 2;
+          const angleStep = (Math.PI * 2) / numPoints;
+
+          // Inner radius grows toward the outer radius as centerDiameter increases
+          const innerMin = 0.35;
+          const innerMax = 0.85;
+          const innerRadius =
+            innerMin + (this.centerDiameter / 100) * (innerMax - innerMin);
+          const outerRadius = 1.0;
+
           const points = [];
+          for (let i = 0; i < numPoints; i++) {
+            const isOuter = i % 2 === 0;
+            let radius = isOuter ? outerRadius : innerRadius;
+            // Start at the top, like Illustrator's star tool
+            const angle = i * angleStep - Math.PI / 2;
 
-          // Generate a wavy perimeter with peaks and valleys
-          for (let i = 0; i < numWaves; i++) {
-            const angle = i * angleStep;
-
-            // Alternate between peaks (outward) and valleys (inward)
-            const isPeak = i % 2 === 0;
-
-            // Base radius varies with irregularity
-            let radius;
-            if (isPeak) {
-              // Peak - extends outward
-              radius =
-                1.0 +
-                random(0.4, 0.8) +
-                random(-this.irregularity * 0.3, this.irregularity * 0.3);
-            } else {
-              // Valley - based on centerDiameter
-              // At 0%, valleys at 0.6 (small center)
-              // At 80%, valleys expand outward to 0.9 (large center)
-              const defaultValley = 0.6;
-              const maxValley = 0.9;
-              const valleyDepth =
-                defaultValley +
-                (this.centerDiameter / 100) * (maxValley - defaultValley);
-              radius =
-                valleyDepth +
-                random(-this.irregularity * 0.2, this.irregularity * 0.2);
+            if (isOuter && this.asymmetric) {
+              // Randomize each outer spike's length between the configured min/max bounds
+              const rand = this.spikeVariance[i / 2] ?? Math.random();
+              const min = this.asymMin / 100;
+              const max = this.asymMax / 100;
+              radius *= min + rand * (max - min);
             }
 
-            // Add subtle variation to angles for organic feel
-            const angleVariation =
-              angleStep * random(-0.3, 0.3) * this.irregularity;
-
-            const x = Math.cos(angle + angleVariation) * radius;
-            const y = Math.sin(angle + angleVariation) * radius;
-
-            points.push({ x, y });
+            points.push({
+              x: Math.cos(angle) * radius,
+              y: Math.sin(angle) * radius,
+            });
           }
 
-          // Smooth the path with intermediate points for curves
-          const smoothedPoints = [];
-          for (let i = 0; i < points.length; i++) {
-            const current = points[i];
-            const next = points[(i + 1) % points.length];
-
-            smoothedPoints.push(current);
-
-            // Add intermediate point for smoother curve
-            const midX =
-              (current.x + next.x) / 2 + random(-0.1, 0.1) * this.irregularity;
-            const midY =
-              (current.y + next.y) / 2 + random(-0.1, 0.1) * this.irregularity;
-
-            smoothedPoints.push({ x: midX, y: midY });
-          }
-
-          return smoothedPoints;
+          return points;
         }
 
-        toPath(width, height, size = 100) {
+        // Convert normalized outline points to canvas-space coordinates
+        getCanvasPoints(width, height, size = 100) {
           const points = this.generateOutline();
-          if (points.length === 0) return "";
-
           const centerX = width / 2;
           const centerY = height / 2;
           const sizeScale = size / 100;
-          const radius = (Math.min(width, height) / 2) * 0.65 * sizeScale;
+          // Size is the star's outer diameter as a percentage of the canvas
+          const radius = (Math.min(width, height) / 2) * sizeScale;
 
-          // Convert to canvas coordinates
-          const canvasPoints = points.map((p) => ({
+          return points.map((p) => ({
             x: centerX + p.x * radius,
             y: centerY + p.y * radius,
           }));
+        }
 
-          // Create closed path with curves
+        // Offset a closed polygon outward by a constant distance using a
+        // true parallel-edge offset (not a stroke), so the offset amount
+        // never distorts the corner-rounding radius.
+        static offsetPolygon(points, distance, center) {
+          if (distance === 0) return points;
+          const n = points.length;
+
+          const normals = points.map((a, i) => {
+            const b = points[(i + 1) % n];
+            const dx = b.x - a.x;
+            const dy = b.y - a.y;
+            const len = Math.hypot(dx, dy) || 1;
+            let nx = -dy / len;
+            let ny = dx / len;
+
+            const midX = (a.x + b.x) / 2;
+            const midY = (a.y + b.y) / 2;
+            const distBefore = Math.hypot(midX - center.x, midY - center.y);
+            const distAfter = Math.hypot(
+              midX + nx - center.x,
+              midY + ny - center.y,
+            );
+            if (distAfter < distBefore) {
+              nx = -nx;
+              ny = -ny;
+            }
+            return { nx, ny };
+          });
+
+          return points.map((curr, i) => {
+            const prevIdx = (i - 1 + n) % n;
+            const a = points[prevIdx];
+            const b = curr;
+            const c = curr;
+            const d = points[(i + 1) % n];
+            const n1 = normals[prevIdx];
+            const n2 = normals[i];
+
+            const p1 = { x: a.x + n1.nx * distance, y: a.y + n1.ny * distance };
+            const dir1 = { x: b.x - a.x, y: b.y - a.y };
+            const p2 = { x: c.x + n2.nx * distance, y: c.y + n2.ny * distance };
+            const dir2 = { x: d.x - c.x, y: d.y - c.y };
+
+            const denom = dir1.x * dir2.y - dir1.y * dir2.x;
+            if (Math.abs(denom) < 1e-6) {
+              return { x: p1.x, y: p1.y };
+            }
+            const t = ((p2.x - p1.x) * dir2.y - (p2.y - p1.y) * dir2.x) / denom;
+            return { x: p1.x + t * dir1.x, y: p1.y + t * dir1.y };
+          });
+        }
+
+        // Build an SVG path string from polygon points, rounding outer and
+        // inner vertices independently
+        static pointsToPath(points, outerRoundness = 0, innerRoundness = 0) {
+          if (points.length === 0) return "";
+
+          const outerAmount = clamp(outerRoundness, 0, 100) / 100;
+          const innerAmount = clamp(innerRoundness, 0, 100) / 100;
+          const n = points.length;
+          const maxCut = 0.45; // fraction of edge length, keeps curves from overlapping
           let path = "";
-          for (let i = 0; i < canvasPoints.length; i++) {
-            const p = canvasPoints[i];
-            if (i === 0) {
-              path += `M ${Math.round(p.x)} ${Math.round(p.y)}`;
+          for (let i = 0; i < n; i++) {
+            const curr = points[i];
+            const isOuter = i % 2 === 0;
+            const roundness = isOuter ? outerAmount : innerAmount;
+
+            if (roundness > 0) {
+              const prev = points[(i - 1 + n) % n];
+              const next = points[(i + 1) % n];
+              const cut = roundness * maxCut;
+
+              const inX = curr.x + (prev.x - curr.x) * cut;
+              const inY = curr.y + (prev.y - curr.y) * cut;
+              const outX = curr.x + (next.x - curr.x) * cut;
+              const outY = curr.y + (next.y - curr.y) * cut;
+
+              path +=
+                i === 0
+                  ? `M ${inX.toFixed(2)} ${inY.toFixed(2)}`
+                  : ` L ${inX.toFixed(2)} ${inY.toFixed(2)}`;
+              path += ` Q ${curr.x.toFixed(2)} ${curr.y.toFixed(2)} ${outX.toFixed(2)} ${outY.toFixed(2)}`;
             } else {
-              path += ` L ${Math.round(p.x)} ${Math.round(p.y)}`;
+              path +=
+                i === 0
+                  ? `M ${curr.x.toFixed(2)} ${curr.y.toFixed(2)}`
+                  : ` L ${curr.x.toFixed(2)} ${curr.y.toFixed(2)}`;
             }
           }
           path += " Z";
 
           return path;
+        }
+
+        // The star's own outline - also the inner edge of the outside stroke band
+        toPath(
+          width,
+          height,
+          size = 100,
+          outerRoundness = 0,
+          innerRoundness = 0,
+        ) {
+          const points = this.getCanvasPoints(width, height, size);
+          return BlastGenerator.pointsToPath(
+            points,
+            outerRoundness,
+            innerRoundness,
+          );
+        }
+
+        // The star outline offset outward by strokeWidth - the outer edge of
+        // the outside stroke band. Rounded independently of the offset
+        // amount so the corner radius scales smoothly from 0.
+        toOuterPath(
+          width,
+          height,
+          size = 100,
+          strokeWidth = 30,
+          outerRoundness = 0,
+          innerRoundness = 0,
+        ) {
+          const points = this.getCanvasPoints(width, height, size);
+          const center = { x: width / 2, y: height / 2 };
+          const offsetPoints = BlastGenerator.offsetPolygon(
+            points,
+            strokeWidth,
+            center,
+          );
+          return BlastGenerator.pointsToPath(
+            offsetPoints,
+            outerRoundness,
+            innerRoundness,
+          );
         }
       }
 
@@ -560,12 +783,18 @@
       const stage = document.getElementById("stage");
       const badge = document.getElementById("badge");
 
+      // Offscreen canvas used to build an outside-aligned stroke band
+      const maskCanvas = document.createElement("canvas");
+      const maskCtx = maskCanvas.getContext("2d");
+
       let resizeTimeout;
 
       function resizeCanvas() {
         const rect = stage.getBoundingClientRect();
         canvas.width = rect.width;
         canvas.height = rect.height;
+        maskCanvas.width = rect.width;
+        maskCanvas.height = rect.height;
         draw();
       }
 
@@ -579,26 +808,133 @@
       // ============================================================
       let currentBlast = null;
       let currentPath = "";
+      let currentOuterPath = "";
+      let spikeVariance = null;
 
       function getOptions() {
+        const spikes = parseInt(document.getElementById("spikes").value);
+        if (!spikeVariance || spikeVariance.length !== spikes) {
+          spikeVariance = Array.from({ length: spikes }, () => Math.random());
+        }
         return {
-          spikes: parseInt(document.getElementById("spikes").value),
+          spikes,
           irregularity: 0.5,
           strokeWidth: parseInt(document.getElementById("strokeWidth").value),
           centerDiameter: parseInt(
             document.getElementById("centerDiameter").value,
           ),
+          asymmetric: document.getElementById("asymmetric").checked,
+          asymMin: parseInt(document.getElementById("asymMin").value),
+          asymMax: parseInt(document.getElementById("asymMax").value),
+          spikeVariance,
         };
       }
 
-      function generateNewBlast() {
+      // Rebuilds the star from current controls, keeping the existing
+      // per-spike randomization (so dragging sliders doesn't reshuffle it)
+      function updateBlast() {
         const options = getOptions();
-        const size = parseInt(document.getElementById("size").value);
+        const size =
+          parseInt(document.getElementById("size").value) *
+          (animating ? breatheScale : 1);
+        const strokeWidth = parseInt(
+          document.getElementById("strokeWidth").value,
+        );
+        const outerRoundness = parseInt(
+          document.getElementById("outerRoundness").value,
+        );
+        const innerRoundness = parseInt(
+          document.getElementById("innerRoundness").value,
+        );
         currentBlast = new BlastGenerator(options);
-        currentPath = currentBlast.toPath(canvas.width, canvas.height, size);
+        currentPath = currentBlast.toPath(
+          canvas.width,
+          canvas.height,
+          size,
+          outerRoundness,
+          innerRoundness,
+        );
+        currentOuterPath = currentBlast.toOuterPath(
+          canvas.width,
+          canvas.height,
+          size,
+          strokeWidth,
+          outerRoundness,
+          innerRoundness,
+        );
         draw();
-        badge.textContent = "Blast generated";
       }
+
+      // Re-randomizes spike lengths, then rebuilds the star
+      function generateNewBlast() {
+        spikeVariance = null;
+        spikeTargets = null;
+        updateBlast();
+      }
+
+      // ============================================================
+      // Living-cell animation: continuously wanders each spike length
+      // and the overall scale toward new random targets
+      // ============================================================
+      let animating = false;
+      let animationFrameId = null;
+      let spikeTargets = null;
+      let breatheScale = 1;
+      let breatheTarget = 1;
+      const animateBtn = document.getElementById("animateBtn");
+
+      function ensureSpikeTargets(n) {
+        if (!spikeTargets || spikeTargets.length !== n) {
+          spikeTargets = Array.from({ length: n }, () => Math.random());
+        }
+      }
+
+      function animationStep() {
+        if (!animating) return;
+
+        ensureSpikeTargets(spikeVariance.length);
+        const speed = 0.1;
+        for (let i = 0; i < spikeVariance.length; i++) {
+          const diff = spikeTargets[i] - spikeVariance[i];
+          spikeVariance[i] += diff * speed;
+          if (Math.abs(diff) < 0.01) spikeTargets[i] = Math.random();
+        }
+
+        const breatheDiff = breatheTarget - breatheScale;
+        breatheScale += breatheDiff * speed;
+        if (Math.abs(breatheDiff) < 0.005) {
+          breatheTarget = 0.94 + Math.random() * 0.12;
+        }
+
+        updateBlast();
+        animationFrameId = requestAnimationFrame(animationStep);
+      }
+
+      function startAnimation() {
+        if (animating) return;
+        animating = true;
+        const spikes = parseInt(document.getElementById("spikes").value);
+        if (!spikeVariance || spikeVariance.length !== spikes) {
+          spikeVariance = Array.from({ length: spikes }, () => Math.random());
+        }
+        ensureSpikeTargets(spikeVariance.length);
+        animateBtn.classList.add("active");
+        animationFrameId = requestAnimationFrame(animationStep);
+      }
+
+      function stopAnimation() {
+        animating = false;
+        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+        breatheScale = 1;
+        animateBtn.classList.remove("active");
+        updateBlast();
+      }
+
+      animateBtn.addEventListener("click", () => {
+        if (animating) stopAnimation();
+        else startAnimation();
+      });
 
       // ============================================================
       // Drawing
@@ -606,9 +942,6 @@
       function draw() {
         const bgColor = document.getElementById("bgColor").value;
         const strokeColor = document.getElementById("strokeColor").value;
-        const strokeWidth = parseInt(
-          document.getElementById("strokeWidth").value,
-        );
 
         // Clear canvas
         ctx.fillStyle = bgColor;
@@ -618,14 +951,18 @@
           return;
         }
 
-        // Draw blast using SVG path with stroke only
-        const path = new Path2D(currentPath);
+        // Outside stroke band = fill of the offset outer path minus the fill
+        // of the star itself, both built with true geometric offsets/curves
+        // so the stroke's own corner rounding never depends on strokeWidth.
+        maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+        maskCtx.globalCompositeOperation = "source-over";
+        maskCtx.fillStyle = strokeColor;
+        maskCtx.fill(new Path2D(currentOuterPath));
+        maskCtx.globalCompositeOperation = "destination-out";
+        maskCtx.fill(new Path2D(currentPath));
+        maskCtx.globalCompositeOperation = "source-over";
 
-        ctx.strokeStyle = strokeColor;
-        ctx.lineWidth = strokeWidth;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.stroke(path);
+        ctx.drawImage(maskCanvas, 0, 0);
       }
 
       // ============================================================
@@ -640,6 +977,18 @@
           valId: "centerDiameterVal",
           format: (v) => v + "%",
         },
+        {
+          id: "outerRoundness",
+          valId: "outerRoundnessVal",
+          format: (v) => v + "%",
+        },
+        {
+          id: "innerRoundness",
+          valId: "innerRoundnessVal",
+          format: (v) => v + "%",
+        },
+        { id: "asymMin", valId: "asymMinVal", format: (v) => v + "%" },
+        { id: "asymMax", valId: "asymMaxVal", format: (v) => v + "%" },
       ];
 
       controls.forEach(({ id, valId, format }) => {
@@ -647,9 +996,31 @@
         const valDisplay = document.getElementById(valId);
         input.addEventListener("input", () => {
           valDisplay.textContent = format(input.value);
-          generateNewBlast();
+          updateBlast();
         });
       });
+
+      // Keep min/max spike length sliders from crossing over each other
+      const asymMinInput = document.getElementById("asymMin");
+      const asymMaxInput = document.getElementById("asymMax");
+      asymMinInput.addEventListener("input", () => {
+        if (parseInt(asymMinInput.value) > parseInt(asymMaxInput.value)) {
+          asymMaxInput.value = asymMinInput.value;
+          document.getElementById("asymMaxVal").textContent =
+            asymMaxInput.value + "%";
+        }
+      });
+      asymMaxInput.addEventListener("input", () => {
+        if (parseInt(asymMaxInput.value) < parseInt(asymMinInput.value)) {
+          asymMinInput.value = asymMaxInput.value;
+          document.getElementById("asymMinVal").textContent =
+            asymMinInput.value + "%";
+        }
+      });
+
+      document
+        .getElementById("asymmetric")
+        .addEventListener("change", updateBlast);
 
       const colorControls = [
         { id: "bgColor", hexId: "bgColorHex" },
@@ -673,8 +1044,6 @@
         .getElementById("generateBtn")
         .addEventListener("click", generateNewBlast);
 
-      stage.addEventListener("click", generateNewBlast);
-
       document.getElementById("exportBtn").addEventListener("click", () => {
         if (!currentPath) {
           alert("Generate a blast first");
@@ -682,12 +1051,13 @@
         }
 
         const strokeColor = document.getElementById("strokeColor").value;
-        const strokeWidth = document.getElementById("strokeWidth").value;
 
+        // The outside stroke band is the ring between the offset outer
+        // path and the star's own path, rendered with evenodd fill.
         const svg = `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <path d="${currentPath}" fill="none" stroke="${strokeColor}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" />
-</svg>`;
+      <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+        <path d="${currentOuterPath} ${currentPath}" fill="${strokeColor}" fill-rule="evenodd" />
+      </svg>`;
 
         const blob = new Blob([svg], { type: "image/svg+xml" });
         const url = URL.createObjectURL(blob);
